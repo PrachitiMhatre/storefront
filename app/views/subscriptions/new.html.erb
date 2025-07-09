@@ -1,0 +1,43 @@
+<h2>Subscribe to a Plan</h2>
+
+<%= form_with url: subscriptions_path, method: :post, id: "subscription-form" do |f| %>
+  <%= select_tag :plan_id, options_from_collection_for_select(@plans, :id, :name), class: "form-input" %>
+  <div id="card-element" class="form-input"></div>
+  <div id="card-errors" class="error-message"></div>
+  <%= submit_tag "Subscribe", class: "btn btn-success" %>
+<% end %>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const stripe = Stripe("<%= Rails.application.credentials.dig(:stripe, :publishable_key) %>");
+    const elements = stripe.elements();
+    const cardElement = elements.create("card");
+    cardElement.mount("#card-element");
+
+    const form = document.getElementById("subscription-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const { setupIntent, error } = await stripe.confirmCardSetup(
+        "<%= @setup_intent.client_secret %>",
+        {
+          payment_method: {
+            card: cardElement,
+          }
+        }
+      );
+
+      if (error) {
+        document.getElementById("card-errors").textContent = error.message;
+      } else {
+        const hidden = document.createElement("input");
+        hidden.setAttribute("type", "hidden");
+        hidden.setAttribute("name", "payment_method");
+        hidden.setAttribute("value", setupIntent.payment_method);
+        form.appendChild(hidden);
+        form.submit();
+      }
+    });
+  });
+</script>

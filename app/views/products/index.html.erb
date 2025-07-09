@@ -1,0 +1,21 @@
+<p class="notice"><%= notice %></p>
+<% if user_signed_in? %>
+  <div class="signout-container">
+    <%= button_to "Sign Out", custom_sign_out_path, method: :get, data: { turbo: false }, class: "btn btn-danger " %>
+  </div>
+<% end %>
+
+<h1 class="page-title">Products</h1>
+
+<div class="products-grid">
+  <% @products.each do |product| %>
+    <div class="product-card">
+      <h3 class="product-name"><%= product.name %></h3>
+      <p class="product-price">Price: ₹<%= product.price_cents / 100.0 %></p>
+
+      <%= form_with url: checkout_product_path(product), method: :post, data: { turbo: false } do %>
+        <%= submit_tag "Buy Now", class: "btn btn-success" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

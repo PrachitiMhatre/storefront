@@ -1,0 +1,18 @@
+<p class="notice"><%= notice %></p>
+
+<div class="product-detail-container">
+  <div class="product-detail-card">
+    <h1 class="product-title"><%= @product.name %></h1>
+    <p class="product-price">Price: ₹<%= @product.price_cents / 100.0 %></p>
+
+    <%= form_with url: checkout_product_path(@product), method: :post, data: { turbo: false } do %>
+      <%= submit_tag "Buy Now with Stripe", class: "btn btn-primary" %>
+    <% end %>
+
+    <div class="product-actions">
+      <%= link_to "← Back to products", products_path, class: "btn btn-secondary" %>
+
+      <%= button_to "Destroy this product", @product, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-small" %>
+    </div>
+  </div>
+</div>
