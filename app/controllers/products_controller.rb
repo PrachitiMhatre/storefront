@@ -35,48 +35,66 @@ class ProductsController < ApplicationController
     end
   end
 
+#payment using Stripe checkout session
+# def checkout
+#   product = Product.find(params[:id])
+
+#   session = Stripe::Checkout::Session.create(
+#     mode: "subscription",
+#     customer: current_user.stripe_customer_id, # optional but recommended
+#     metadata: {
+#       product_id: product.id,
+#       user_id: current_user.id
+#     },
+#     allow_promotion_codes: true,
+#     line_items: [{
+#       price: product.stripe_price_id,
+#       quantity: 1
+#     }],
+#     customer_update: {
+#       name: 'auto',
+#       address: 'auto'
+#     },
+#     shipping_address_collection: {
+#     allowed_countries: ['US', 'CA', 'GB'] # limit to specific countries
+#     },
+#     # discounts: [{
+#     #   promotion_code: 'promo_1Riu7PGhhMWnUmbBwml17hMd'
+#     # }],
+#     success_url: product_url(product, paid: true),
+#     cancel_url: product_url(product)
+#   )
+
+#   redirect_to session.url, allow_other_host: true
+# end
+
+
 def checkout
+  @product = Product.find(params[:id])
+end
+
+def create_payment_intent
   product = Product.find(params[:id])
-  session = Stripe::Checkout::Session.create(
-    mode: "payment",
+  amount = product.price_cents
+
+  payment_intent = Stripe::PaymentIntent.create(
+    amount: amount,
+    currency: 'inr',
+    customer: current_user.stripe_customer_id,
     metadata: {
       product_id: product.id,
       user_id: current_user.id
     },
-    line_items: [{
-      price_data: {
-        currency: "usd",
-        unit_amount: product.price_cents,
-        product_data: {
-          name: product.name
-        }
-      },
-      quantity: 1
-    }],
-    success_url: product_url(product, paid: true),
-    cancel_url: product_url(product)
+    automatic_payment_methods: {
+      enabled: true
+    }
   )
 
-  redirect_to session.url, allow_other_host: true
+  render json: { client_secret: payment_intent.client_secret }
 end
 
-  # def checkout
-  #   @product = Product.find(params[:id])
 
-  #   payment_intent = Stripe::PaymentIntent.create(
-  #     amount: @product.price_cents,
-  #     currency: 'usd',
-  #     metadata: {
-  #       product_id: @product.id,
-  #       user_id: current_user.id
-  #     }
-  #   )
-
-  #   render json: { client_secret: payment_intent.client_secret }
-  # end
-
-
-  # PATCH/PUT /products/1 or /products/1.json
+# PATCH/PUT /products/1 or /products/1.json
   def update
     respond_to do |format|
       if @product.update(product_params)

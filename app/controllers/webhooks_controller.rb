@@ -18,10 +18,19 @@ class WebhooksController < ApplicationController
     when 'checkout.session.completed'
       session = event.data.object
 
-      # ✅ Payment successful
+      # Payment successful
       handle_successful_checkout(session)
+
+    when 'payment_intent.succeeded'
+      payment_intent = event.data.object
+      handle_payment_intent_succeeded(payment_intent)
+
+    when 'payment_intent.payment_failed'
+      payment_intent = event.data.object
+      handle_payment_intent_failed(payment_intent)
+
     when 'checkout.session.expired'
-      # ⚠️ Optional: Session expired
+      # Optional: Session expired
     else
       Rails.logger.info("Unhandled event type: #{event.type}")
     end
@@ -34,12 +43,34 @@ class WebhooksController < ApplicationController
   def handle_successful_checkout(session)
     # Lookup product if you stored metadata (recommended)
     # For example: session.metadata["product_id"]
-    product_name = session.line_items&.first&.description || session.metadata&.dig("product_name")
-
+    product_name = session.line_items&.first&.description || session.metadata&.[]("product_name")
     # You can track the user/payment here
     Rails.logger.info "Payment succeeded for session: #{session.id}"
     Rails.logger.info "Customer email: #{session.customer_details.email}"
 
     # You could mark the product as purchased, create an order, etc.
+  end
+
+  def handle_payment_intent_succeeded(payment_intent)
+    customer_id = payment_intent.customer
+    amount = payment_intent.amount_received
+    metadata = payment_intent.metadata
+
+    Rails.logger.info "PaymentIntent succeeded: #{payment_intent.id}"
+    Rails.logger.info "Amount received: #{amount}"
+    Rails.logger.info "Metadata: #{metadata.inspect}"
+
+    # Example: Find user or order by metadata
+    # user = User.find_by(stripe_customer_id: customer_id)
+    # Order.find_by(id: metadata["order_id"])&.mark_as_paid!
+  end
+
+  def handle_payment_intent_failed(payment_intent)
+    error_message = payment_intent.last_payment_error&.message
+
+    Rails.logger.warn "PaymentIntent failed: #{payment_intent.id}"
+    Rails.logger.warn "Error message: #{error_message}"
+
+    # Notify the user or log the failure
   end
 end

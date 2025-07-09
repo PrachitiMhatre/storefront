@@ -1,0 +1,165 @@
+<h1 class="checkout-title">Complete Your Payment</h1>
+
+<div class="checkout-wrapper">
+  <p class="product-info">
+    You're paying: <strong>₹<%= @product.price_cents / 100.0 %></strong> for
+    <em><%= @product.name %></em>
+  </p>
+
+  <form id="payment-form">
+    <label for="card-element" class="card-label">Credit or debit card</label>
+    <div id="card-element" class="card-element"></div>
+
+    <div id="payment-message" class="payment-message"></div>
+
+    <button id="submit" class="btn-pay" type="submit">Pay Now</button>
+  </form>
+</div>
+
+<!-- Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<style>
+  /* Container styling */
+  .checkout-wrapper {
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #fefefe;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Title */
+  .checkout-title {
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Product info */
+  .product-info {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 24px;
+    color: #444;
+  }
+
+  /* Card label */
+  .card-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+  }
+
+  /* Stripe Card Element */
+  .card-element {
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 14px 12px;
+    background: white;
+    margin-bottom: 16px;
+  }
+
+  /* Payment message */
+  .payment-message {
+    min-height: 24px;
+    margin-bottom: 16px;
+    color: #e03e2f; /* red for errors */
+    font-weight: 600;
+  }
+
+  /* Pay button */
+  .btn-pay {
+    width: 100%;
+    padding: 14px 0;
+    font-size: 18px;
+    font-weight: 700;
+    background: #556cd6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .btn-pay:hover {
+    background: #4057b5;
+  }
+  .btn-pay:disabled {
+    background: #a0a5d9;
+    cursor: not-allowed;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const stripe = Stripe("<%= Rails.application.credentials.dig(:stripe, :publishable_key) %>");
+    if (!stripe) {
+      document.getElementById("payment-message").innerText = "Stripe failed to initialize.";
+      return;
+    }
+
+    const response = await fetch("<%= create_payment_intent_product_path(@product) %>", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": "<%= form_authenticity_token %>"
+      }
+    });
+
+    if (!response.ok) {
+      document.getElementById("payment-message").innerText = "Unable to start payment.";
+      return;
+    }
+
+    const { client_secret } = await response.json();
+
+    const elements = stripe.elements();
+    const card = elements.create("card", {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#32325d',
+          fontFamily: 'Arial, sans-serif',
+          '::placeholder': {
+            color: '#a0aec0',
+          },
+        },
+        invalid: {
+          color: '#e03e2f',
+        },
+      },
+    });
+    card.mount("#card-element");
+
+    const form = document.getElementById("payment-form");
+    const submitButton = document.getElementById("submit");
+    const paymentMessage = document.getElementById("payment-message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      submitButton.disabled = true;
+      paymentMessage.textContent = "";
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: card,
+        },
+      });
+
+      if (error) {
+        paymentMessage.textContent = error.message;
+        submitButton.disabled = false;
+      } else if (paymentIntent.status === "succeeded") {
+        paymentMessage.style.color = "green";
+        paymentMessage.textContent = "Payment successful! Redirecting...";
+        setTimeout(() => {
+          window.location.href = "<%= product_path(@product, paid: true) %>";
+        }, 1500);
+      }
+    });
+  });
+</script>

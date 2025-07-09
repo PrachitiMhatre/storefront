@@ -1,0 +1,100 @@
+<style>
+  .form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+  }
+
+  .form-container h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #555;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #4A90E2;
+    outline: none;
+  }
+
+  .submit-button {
+    display: block;
+    width: 100%;
+    background-color: #4A90E2;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .submit-button:hover {
+    background-color: #357ABD;
+  }
+</style>
+
+<div class="form-container">
+  <h1>Create Coupon & Promo Code</h1>
+
+  <%= form_with url: coupons_path, method: :post do %>
+    <div class="form-group">
+      <label>Name</label>
+      <%= text_field_tag :name, nil %>
+    </div>
+
+    <div class="form-group">
+      <label>Percent Off (%)</label>
+      <%= number_field_tag :percent_off, 10 %>
+    </div>
+
+    <div class="form-group">
+      <label>Duration</label>
+      <%= select_tag :duration, options_for_select([['Once', 'once'], ['Repeating', 'repeating'], ['Forever', 'forever']]) %>
+    </div>
+
+    <div class="form-group">
+      <label>Duration in Months (if repeating)</label>
+      <%= number_field_tag :duration_in_months %>
+    </div>
+
+    <div class="form-group">
+      <label>Redeem By (expiry date)</label>
+      <%= date_field_tag :redeem_by %>
+    </div>
+
+    <div class="form-group">
+      <label>Promo Code (unique string)</label>
+      <%= text_field_tag :code %>
+    </div>
+
+    <%= submit_tag "Create Coupon", class: "submit-button" %>
+  <% end %>
+</div>

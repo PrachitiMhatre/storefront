@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_08_103423) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_09_063346) do
   create_table "plans", force: :cascade do |t|
     t.string "name"
     t.integer "price_cents"
@@ -24,6 +24,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_08_103423) do
     t.integer "price_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_price_id"
   end
 
   create_table "subscriptions", force: :cascade do |t|

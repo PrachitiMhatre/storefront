@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :coupons, only: [:index, :new, :create]
+
   get 'webhooks/stripe'
   devise_for :users
   # resources :products
@@ -11,8 +13,11 @@ Rails.application.routes.draw do
   root to: "products#index"
 
   get "/custom_sign_out", to: "users#custom_sign_out", as: :custom_sign_out
-  resources :products, only: [:index, :show] do
-    post :checkout, on: :member   # /products/:id/checkout
+  resources :products do
+    member do
+      get :checkout
+      post :create_payment_intent
+    end
   end
   resources :subscriptions, only: [:new, :create]
   post '/webhooks/stripe', to: 'webhooks#stripe'
