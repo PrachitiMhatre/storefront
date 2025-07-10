@@ -1,27 +1,35 @@
-<%= form_with(model: product) do |form| %>
-  <% if product.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(product.errors.count, "error") %> prohibited this product from being saved:</h2>
+<div class="form-container">
+  <h1><%= product.new_record? ? "Create Product" : "Edit Product" %></h1>
 
-      <ul>
-        <% product.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+  <%= form_with(model: product, local: true, html: { multipart: true }) do |form| %>
+
+    <% if product.errors.any? %>
+      <div class="form-errors" style="color: red">
+        <h2><%= pluralize(product.errors.count, "error") %> prohibited this product from being saved:</h2>
+        <ul>
+          <% product.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= form.label :name %>
+      <%= form.text_field :name %>
     </div>
+
+    <div class="form-group">
+      <%= form.label :image, "Product Image" %>
+      <%= form.file_field :image %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :price_cents, "Price (in cents)" %>
+      <%= form.number_field :price_cents %>
+    </div>
+
+    <%= form.submit product.new_record? ? "Create Product" : "Update Product", class: "submit-button" %>
+
   <% end %>
-
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
-  </div>
-
-  <div>
-    <%= form.label :price_cents, style: "display: block" %>
-    <%= form.number_field :price_cents %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
-<% end %>
+</div>

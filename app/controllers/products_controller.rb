@@ -69,29 +69,39 @@ class ProductsController < ApplicationController
 # end
 
 
-def checkout
-  @product = Product.find(params[:id])
-end
+  def checkout
+    @product = Product.find(params[:id])
+  end
 
-def create_payment_intent
-  product = Product.find(params[:id])
-  amount = product.price_cents
+  def create_payment_intent
+    product = Product.find(params[:id])
+    amount = product.price_cents
 
-  payment_intent = Stripe::PaymentIntent.create(
-    amount: amount,
-    currency: 'inr',
-    customer: current_user.stripe_customer_id,
-    metadata: {
-      product_id: product.id,
-      user_id: current_user.id
-    },
-    automatic_payment_methods: {
-      enabled: true
-    }
-  )
+    payment_intent = Stripe::PaymentIntent.create(
+      amount: amount,
+      currency: 'inr',
+      customer: current_user.stripe_customer_id,
+      metadata: {
+        product_id: product.id,
+        user_id: current_user.id
+      },
+      automatic_payment_methods: {
+        enabled: true
+      }
+    )
 
-  render json: { client_secret: payment_intent.client_secret }
-end
+    render json: { client_secret: payment_intent.client_secret }
+  end
+
+  def search
+    if params[:query].present?
+      @products = Product.search(params[:query]).records
+    else
+      @products = Product.all
+    end
+
+    render :index
+  end
 
 
 # PATCH/PUT /products/1 or /products/1.json
@@ -125,6 +135,6 @@ end
 
     # Only allow a list of trusted parameters through.
     def product_params
-      params.require(:product).permit(:name, :price_cents)
+      params.require(:product).permit(:name, :price_cents, :image)
     end
 end

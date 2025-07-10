@@ -2,17 +2,24 @@
 
 <div class="product-detail-container">
   <div class="product-detail-card">
+
+    <% if @product.image.attached? %>
+      <div class="product-image-wrapper">
+        <%= image_tag @product.image.variant(resize_to_limit: [300, 300]), alt: @product.name, class: "product-detail-image" %>
+      </div>
+    <% end %>
+
     <h1 class="product-title"><%= @product.name %></h1>
     <p class="product-price">Price: ₹<%= @product.price_cents / 100.0 %></p>
 
     <%= form_with url: checkout_product_path(@product), method: :post, data: { turbo: false } do %>
-      <%= submit_tag "Buy Now with Stripe", class: "btn btn-primary" %>
+      <%= submit_tag "Buy Now with Stripe", class: "btn btn-success btn-block" %>
     <% end %>
 
     <div class="product-actions">
-      <%= link_to "← Back to products", products_path, class: "btn btn-secondary" %>
-
-      <%= button_to "Destroy this product", @product, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-small" %>
+      <%= link_to "← Back to Products", products_path, class: "btn btn-secondary btn-small" %>
+      <%= button_to "Destroy this Product", @product, method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger btn-small" %>
     </div>
+    
   </div>
 </div>

@@ -78,35 +78,6 @@
   font-size: 32px;
   margin-bottom: 30px;
 }
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  padding: 0 20px;
-  margin-bottom: 40px;
-}
-
-.product-card {
-  border: 1px solid #ddd;
-  padding: 20px;
-  border-radius: 8px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  text-align: center;
-}
-
-.product-name {
-  font-size: 20px;
-  margin-bottom: 10px;
-}
-
-.product-price {
-  font-size: 16px;
-  margin-bottom: 15px;
-  color: #444;
-}
-
 /* Buttons */
 .btn {
   display: inline-block;
@@ -181,4 +152,116 @@
   margin-bottom: 20px;
   text-align: center;
   color: #555;
+}
+.products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: flex-start;
+}
+
+.product-card {
+  width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  background-color: #fafafa;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-image {
+  width: 150px;
+  height: auto;
+  margin: 0 auto 10px;
+  border-radius: 4px;
+}
+
+.product-name {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.product-price {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.buy-button {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-top: auto;
+  align-self: center;
+}
+
+/* Container */
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+  max-width: 600px;
+  gap: 10px;
+}
+
+/* Text Field */
+.search-input {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+}
+
+/* Button */
+.search-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff; /* Bootstrap Primary */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
+}
+.product-detail-image {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.product-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.btn-block {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.product-image-wrapper {
+  text-align: center;
+  margin-bottom: 10px;
 }

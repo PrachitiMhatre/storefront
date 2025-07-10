@@ -18,6 +18,9 @@ Rails.application.routes.draw do
       get :checkout
       post :create_payment_intent
     end
+    collection do
+      get :search
+    end
   end
   resources :subscriptions, only: [:new, :create]
   post '/webhooks/stripe', to: 'webhooks#stripe'

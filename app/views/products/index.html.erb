@@ -1,8 +1,14 @@
 <p class="notice"><%= notice %></p>
+
 <% if user_signed_in? %>
   <div class="signout-container">
-    <%= button_to "Sign Out", custom_sign_out_path, method: :get, data: { turbo: false }, class: "btn btn-danger " %>
+    <%= button_to "Sign Out", custom_sign_out_path, method: :get, data: { turbo: false }, class: "btn btn-danger" %>
   </div>
+<% end %>
+
+<%= form_with url: search_products_path, method: :get, local: true, class: "search-form" do %>
+  <%= text_field_tag :query, params[:query], placeholder: "Search products...", class: "search-input" %>
+  <%= submit_tag "Search", class: "btn btn-primary search-button" %>
 <% end %>
 
 <h1 class="page-title">Products</h1>
@@ -10,13 +16,16 @@
 <div class="products-grid">
   <% @products.each do |product| %>
     <div class="product-card">
+      <% if product.image.attached? %>
+        <%= image_tag product.image.variant(resize_to_limit: [150, 150]), alt: product.name, class: "product-image" %>
+      <% else %>
+        <p class="no-image">No image available</p>
+      <% end %>
+
       <h3 class="product-name"><%= product.name %></h3>
       <p class="product-price">Price: ₹<%= product.price_cents / 100.0 %></p>
 
-      <%#= form_with url: checkout_product_path(product), method: :post, data: { turbo: false } do %>
-        <%#= submit_tag "Buy Now", class: "btn btn-success" %>
-      <%# end %>
-      <%= link_to "Buy Now", checkout_product_path(product), class: "btn btn-success" %>
+      <%= link_to "Buy Now", checkout_product_path(product), class: "btn btn-success buy-button" %>
     </div>
   <% end %>
 </div>
